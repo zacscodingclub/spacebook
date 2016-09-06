@@ -28,6 +28,13 @@ angular.module('myApp.facebook', ['ngRoute', 'ngFacebook'])
      }(document, 'script', 'facebook-jssdk'));
   })
 
-  .controller('FacebookController', [function() {
+  .controller('FacebookController', ['$scope', '$facebook', function($scope, $facebook) {
+    $scope.isLoggedIn = false;
 
+    $scope.login = function() {
+      $facebook.login()
+        .then(function(){
+          console.log('Testing Login')
+        });
+    }
   }]);
