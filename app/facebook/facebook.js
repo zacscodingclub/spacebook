@@ -11,11 +11,7 @@ angular.module('myApp.facebook', ['ngRoute', 'ngFacebook'])
 
   .config(function($facebookProvider) {
     $facebookProvider.setAppId('1502992906393073');
-    $facebookProvider.setPermissions("email",
-                                     "public_profile",
-                                     "user_posts",
-                                     "publish_actions",
-                                     "user_photos");
+    $facebookProvider.setPermissions('email, public_profile, user_posts, publish_actions, user_photos');
   })
 
   .run(function($rootScope) {
@@ -30,7 +26,6 @@ angular.module('myApp.facebook', ['ngRoute', 'ngFacebook'])
 
   .controller('FacebookController', ['$scope', '$facebook', function($scope, $facebook) {
     $scope.isLoggedIn = false;
-    $scope.welcomeMessage = 'Please log in.';
 
     $scope.login = function() {
       $facebook.login()
@@ -49,14 +44,38 @@ angular.module('myApp.facebook', ['ngRoute', 'ngFacebook'])
     }
 
     function refresh() {
-      $facebook.api("/me")
+      $facebook.api('/me')
         .then(function(response){
-          debugger;
           $scope.userInfo = response;
-          $scope.welcomeMessage = "Welcome " + $scope.userInfo.name;
+          $scope.welcomeMessage = "Welcome " + response.name;
+          $scope.userInfo.first_name = response.name.split(" ")[0];
+          $scope.userInfo.last_name = response.name.split(" ")[1];
+          $facebook.api('/me/picture')
+            .then(function(response) {
+              $scope.picture = response.data.url;
+              $facebook.api('/me/permissions')
+                .then(function(response) {
+                  $scope.permissions = response.data;
+                  $facebook.api('/me/posts')
+                    .then(function(response) {
+                      $scope.posts = response.data;
+                    });
+                });
+            });
         }, function(error) {
           $scope.welcomeMessage = "Please log in";
-          console.log("There was an error: " + error);
         })
     }
+
+    $scope.postStatus = function() {
+      var body = this.newPost;
+
+      $facebook.api('/me/feed', 'post', { message: body })
+                  .then(function(response) {
+                    $scope.msg = 'Thanks for posting.';
+                    refresh();
+                  })
+    }
+
+    refresh();
   }]);
