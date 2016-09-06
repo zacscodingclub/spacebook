@@ -30,11 +30,33 @@ angular.module('myApp.facebook', ['ngRoute', 'ngFacebook'])
 
   .controller('FacebookController', ['$scope', '$facebook', function($scope, $facebook) {
     $scope.isLoggedIn = false;
+    $scope.welcomeMessage = 'Please log in.';
 
     $scope.login = function() {
       $facebook.login()
         .then(function(){
-          console.log('Testing Login')
+          $scope.isLoggedIn = true;
+          refresh();
         });
+    }
+
+    $scope.logout = function() {
+      $facebook.logout()
+        .then(function() {
+          $scope.isLoggedIn = false;
+          refresh();
+        })
+    }
+
+    function refresh() {
+      $facebook.api("/me")
+        .then(function(response){
+          debugger;
+          $scope.userInfo = response;
+          $scope.welcomeMessage = "Welcome " + $scope.userInfo.name;
+        }, function(error) {
+          $scope.welcomeMessage = "Please log in";
+          console.log("There was an error: " + error);
+        })
     }
   }]);

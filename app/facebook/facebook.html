@@ -1,7 +1,12 @@
-<div class="row" ng-controller="FacebookController as vm">
+<div class="row" ng-controller="FacebookController">
   <div class="col-md-4">
-   <h4>Please Log In</h4>
-   <button class="btn btn-default" ng-click="login()">Login</button>
+   <h4>{{ welcomeMessage }}</h4>
+   <div ng-if="isLoggedIn == false">
+     <button class="btn btn-default" ng-click="login()">Login</button>
+   </div>
+   <div ng-if="isLoggedIn == true">
+     <button class="btn btn-default" ng-click="logout()">Logout</button>
+   </div>
    <br><br>
    <div class="card">
      <h4 class="card-header">User Info</h4>
